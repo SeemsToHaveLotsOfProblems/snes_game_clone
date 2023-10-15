@@ -1,0 +1,20 @@
+[gd_scene load_steps=5 format=3 uid="uid://oycn5gwaqp1h"]
+
+[ext_resource type="Texture2D" uid="uid://crhtdpx12nj3x" path="res://brick/brick.png" id="1_opuly"]
+[ext_resource type="Script" path="res://brick/position_setter.gd" id="2_buyoh"]
+[ext_resource type="Script" path="res://brick/color_picker.gd" id="2_h8m53"]
+[ext_resource type="Script" path="res://brick/touch_commands.gd" id="2_lb660"]
+
+[node name="TouchScreenButton" type="TouchScreenButton"]
+self_modulate = Color(0, 0, 0, 1)
+texture_normal = ExtResource("1_opuly")
+script = ExtResource("2_lb660")
+
+[node name="ColorPicker" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_h8m53")
+
+[node name="PositionSetter" type="Node" parent="."]
+script = ExtResource("2_buyoh")
+
+[connection signal="released" from="." to="." method="_on_released"]

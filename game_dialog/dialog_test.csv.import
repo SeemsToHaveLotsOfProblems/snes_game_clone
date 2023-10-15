@@ -1,0 +1,17 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://cfwxik6wf5xnr"
+
+[deps]
+
+files=["res://game_dialog/dialog_test.en.translation"]
+
+source_file="res://game_dialog/dialog_test.csv"
+dest_files=["res://game_dialog/dialog_test.en.translation"]
+
+[params]
+
+compress=true
+delimiter=0
