@@ -32,8 +32,10 @@ func _on_released() -> void:
 
 
 func handle_swipe() -> void:
-	if Vector2(swipe_start - swipe_end).x < dead_zone:
-		print(brick_color + " brick, draged to the right")
-	elif Vector2(swipe_start - swipe_end).x > dead_zone:
-		print(brick_color + " brick, draged to the left")
+	if Vector2(swipe_start - swipe_end).x < dead_zone: # Right
+#		print(brick_color + " brick, draged to the right")
+		Global.emit_signal("dragged_brick", self, Global.brick_direction.RIGHT)
+	elif Vector2(swipe_start - swipe_end).x > dead_zone: # Left
+#		print(brick_color + " brick, draged to the left")
+		Global.emit_signal("dragged_brick", self, Global.brick_direction.LEFT)
 
