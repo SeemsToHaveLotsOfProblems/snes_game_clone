@@ -30,8 +30,6 @@ var row_array: Array[Array] = []
 
 var timer: Timer
 
-var are_bricks_moving_up: bool = false
-
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -58,13 +56,11 @@ func find_nodes() -> void:
 
 
 func trigger_brick_signals() -> void:
-	are_bricks_moving_up = true
 	emit_signal("move_bricks_up")
 	create_row()
 	if row_array.size() >= max_rows:
 		gameover()
 		return
-	are_bricks_moving_up = false
 
 
 func create_row() -> void:
@@ -87,7 +83,7 @@ func make_timer() -> void:
 	timer = Timer.new()
 	timer.wait_time = brick_speed
 	timer.autostart = true
-	timer.connect("timeout", trigger_brick_signals)
+	timer.timeout.connect(trigger_brick_signals)
 	if game_board == null:
 		find_nodes()
 	game_board.add_child(timer)
@@ -106,42 +102,44 @@ func handle_brick_drag(brick: TouchScreenButton, direction: brick_direction) -> 
 	else:
 		print("Direction: Left")
 	
-	# Ignores the function if the bricks are in the process of moving.
-	if are_bricks_moving_up:
-		return
-	
 	# Itterate through my bricks to find the row and position.
 	@warning_ignore("unassigned_variable")
 	var brick_row_pos := Vector2(-1, -1)
-	for i in row_array:
-		brick_row_pos.x += 1
-		brick_row_pos.y = -1
-		for j in i[1]:
-			brick_row_pos.y += 1
-			if j == brick:
-				print("Brick Row: ", brick_row_pos.x)
-				print("Brick pos: ", brick_row_pos.y)
-				# We only need the break here because the variable is incremented as the loop runs.
-				break
+	var found_brick: bool = false
+	for row in row_array:
+		if not found_brick:
+			brick_row_pos.x += 1
+			brick_row_pos.y = -1
+			for _brick in row[1]:
+				brick_row_pos.y += 1
+				if _brick == brick:
+					print("Brick Row: ", brick_row_pos.x)
+					print("Brick pos: ", brick_row_pos.y)
+					# We only need the break here because the variable is incremented as the loop runs.
+					found_brick = true
+					break
 	
 	swap_bricks(brick_row_pos, direction, brick)
 
 
 func swap_bricks(brick_row_pos: Vector2, direction: brick_direction, brick: TouchScreenButton) -> void:
 	var brick_to_swap: TouchScreenButton
-	# Ignores the function if the brick is being moved to an invalid location.
-	if brick_row_pos.y + 1 > bricks_in_row or brick_row_pos.y - 1 < 0:
-			return
-	
-	# Erase the dragged brick from the array
-	row_array[brick_row_pos.x][1].erase(brick)
 	
 	## Place the dragged brick back into the array, one place left or right of 
 	## it's original position.
+	var brick_holder: TouchScreenButton = null
 	if direction == brick_direction.RIGHT:
-		row_array[brick_row_pos.x][1].insert(brick_row_pos.y + 1, brick)
+		if brick_row_pos.y + 1 > bricks_in_row - 1:
+			return
+		brick_holder = row_array[brick_row_pos.x][1][brick_row_pos.y + 1]
+		row_array[brick_row_pos.x][1][brick_row_pos.y + 1] = brick
+		row_array[brick_row_pos.x][1][brick_row_pos.y] = brick_holder
 	elif direction == brick_direction.LEFT:
-		row_array[brick_row_pos.x][1].insert(brick_row_pos.y - 1, brick)
+		if brick_row_pos.y - 1 < 0:
+			return
+		brick_holder = row_array[brick_row_pos.x][1][brick_row_pos.y - 1]
+		row_array[brick_row_pos.x][1][brick_row_pos.y - 1] = brick
+		row_array[brick_row_pos.x][1][brick_row_pos.y] = brick_holder
 	
 	brick_to_swap = row_array[brick_row_pos.x][1][brick_row_pos.y]
 	var old_pos: Vector2 = brick.position

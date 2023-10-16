@@ -30,6 +30,7 @@ action = "pause"
 anchors_preset = 0
 
 [node name="ScoreTextLabel" type="RichTextLabel" parent="ScoreText"]
+layout_mode = 0
 offset_left = 461.0
 offset_top = 108.0
 offset_right = 736.0
@@ -40,6 +41,7 @@ text = "SCORE:"
 scroll_active = false
 
 [node name="ScoreLabel" type="RichTextLabel" parent="ScoreText"]
+layout_mode = 0
 offset_left = 730.0
 offset_top = 114.0
 offset_right = 1018.0
@@ -53,6 +55,7 @@ scroll_active = false
 anchors_preset = 0
 
 [node name="SpeedTextLabel" type="RichTextLabel" parent="SpeedText"]
+layout_mode = 0
 offset_left = 37.0
 offset_top = 25.0
 offset_right = 306.0
@@ -63,6 +66,7 @@ text = "SPEED: "
 scroll_active = false
 
 [node name="SpeedText" type="RichTextLabel" parent="SpeedText"]
+layout_mode = 0
 offset_left = 329.0
 offset_top = 28.0
 offset_right = 439.0
