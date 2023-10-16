@@ -1,0 +1,74 @@
+[gd_scene load_steps=3 format=3 uid="uid://dn6d602qsyva4"]
+
+[ext_resource type="Texture2D" uid="uid://000hsnxbnj4b" path="res://icon.svg" id="1_ij60m"]
+[ext_resource type="Script" path="res://GameUI/speed_text.gd" id="2_yy6k1"]
+
+[node name="TopUIContainer" type="Control"]
+top_level = true
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1442.0
+offset_bottom = 400.0
+
+[node name="UiBackground" type="TextureRect" parent="."]
+self_modulate = Color(0, 0, 0, 0.360784)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_ij60m")
+
+[node name="PauseButton" type="TouchScreenButton" parent="."]
+process_mode = 3
+position = Vector2(1286, 46)
+texture_normal = ExtResource("1_ij60m")
+action = "pause"
+
+[node name="ScoreText" type="Control" parent="."]
+anchors_preset = 0
+
+[node name="ScoreTextLabel" type="RichTextLabel" parent="ScoreText"]
+offset_left = 461.0
+offset_top = 108.0
+offset_right = 736.0
+offset_bottom = 214.0
+theme_override_font_sizes/normal_font_size = 72
+bbcode_enabled = true
+text = "SCORE:"
+scroll_active = false
+
+[node name="ScoreLabel" type="RichTextLabel" parent="ScoreText"]
+offset_left = 730.0
+offset_top = 114.0
+offset_right = 1018.0
+offset_bottom = 211.0
+theme_override_font_sizes/normal_font_size = 72
+bbcode_enabled = true
+text = "0000"
+scroll_active = false
+
+[node name="SpeedText" type="Control" parent="."]
+anchors_preset = 0
+
+[node name="SpeedTextLabel" type="RichTextLabel" parent="SpeedText"]
+offset_left = 37.0
+offset_top = 25.0
+offset_right = 306.0
+offset_bottom = 130.0
+theme_override_font_sizes/normal_font_size = 72
+bbcode_enabled = true
+text = "SPEED: "
+scroll_active = false
+
+[node name="SpeedText" type="RichTextLabel" parent="SpeedText"]
+offset_left = 329.0
+offset_top = 28.0
+offset_right = 439.0
+offset_bottom = 113.0
+theme_override_font_sizes/normal_font_size = 72
+bbcode_enabled = true
+text = "1"
+scroll_active = false
+script = ExtResource("2_yy6k1")

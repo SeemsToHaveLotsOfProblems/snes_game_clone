@@ -1,5 +1,13 @@
-[gd_scene format=3 uid="uid://dv8h2tcrugk15"]
+[gd_scene load_steps=2 format=3 uid="uid://dv8h2tcrugk15"]
+
+[ext_resource type="PackedScene" uid="uid://dn6d602qsyva4" path="res://top_ui_container.tscn" id="1_avedt"]
 
 [node name="GameBoard" type="Node2D"]
 
 [node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="TopUIContainer" parent="." instance=ExtResource("1_avedt")]
+offset_left = -723.0
+offset_top = -1608.0
+offset_right = 719.0
+offset_bottom = -1208.0
