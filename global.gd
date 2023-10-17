@@ -30,6 +30,9 @@ var row_array: Array[Array] = []
 
 var timer: Timer
 
+var points_per_brick: int = 10
+var multiplier: int = 1
+
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -58,6 +61,7 @@ func find_nodes() -> void:
 func trigger_brick_signals() -> void:
 	emit_signal("move_bricks_up")
 	create_row()
+	check_color_match()
 	if row_array.size() >= max_rows:
 		gameover()
 		return
@@ -145,3 +149,50 @@ func swap_bricks(brick_row_pos: Vector2, direction: brick_direction, brick: Touc
 	var old_pos: Vector2 = brick.position
 	brick.position = brick_to_swap.position
 	brick_to_swap.position = old_pos
+	check_color_match()
+
+
+func check_color_match() -> void:
+	# Check for 3 or more in a row.
+	@warning_ignore("unassigned_variable")
+	var brick_row_match: Array[TouchScreenButton]
+	@warning_ignore("unused_variable")
+	var brick_colum_match: Array[TouchScreenButton]
+	var match_color: String
+	for row in row_array:
+		# When new row is searched it checks the pop array first.
+		if brick_row_match.size() >= 3:
+			for matched in brick_row_match:
+				matched.pop_brick()
+		brick_row_match.clear()
+		# Row Checking
+		for _brick in row[1]:
+			if _brick != null:
+				if brick_row_match.is_empty():
+					match_color = _brick.brick_color
+				
+				if _brick.brick_color == match_color:
+					brick_row_match.append(_brick)
+				
+				if _brick.brick_color != match_color:
+					# When color breaks happen the brick pop triggers
+					if brick_row_match.size() >= 3:
+						for matched in brick_row_match:
+							matched.pop_brick()
+					# Clear out the match array
+					brick_row_match.clear()
+			else:
+				if brick_row_match.size() >= 3:
+					for matched in brick_row_match:
+						matched.pop_brick()
+				# Clear out the match array
+				brick_row_match.clear()
+		# Colum checking.
+		
+	drop_floating_bricks()
+	# Update score.
+
+
+# Finds how far down the next brick is and drops any floating bricks.
+func drop_floating_bricks() -> void:
+	pass

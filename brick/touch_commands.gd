@@ -39,3 +39,11 @@ func handle_swipe() -> void:
 #		print(brick_color + " brick, draged to the left")
 		Global.emit_signal("dragged_brick", self, Global.brick_direction.LEFT)
 
+
+
+func pop_brick() -> void:
+	for row in Global.row_array:
+		for brick in row[1]:
+			if brick == self:
+				brick = null
+				self.queue_free()
