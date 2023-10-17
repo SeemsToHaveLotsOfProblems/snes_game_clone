@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://dn6d602qsyva4"]
+[gd_scene load_steps=4 format=3 uid="uid://dn6d602qsyva4"]
 
 [ext_resource type="Texture2D" uid="uid://000hsnxbnj4b" path="res://icon.svg" id="1_ij60m"]
+[ext_resource type="Script" path="res://score_label.gd" id="2_2l63d"]
 [ext_resource type="Script" path="res://GameUI/speed_text.gd" id="2_yy6k1"]
 
 [node name="TopUIContainer" type="Control"]
@@ -50,6 +51,7 @@ theme_override_font_sizes/normal_font_size = 72
 bbcode_enabled = true
 text = "0000"
 scroll_active = false
+script = ExtResource("2_2l63d")
 
 [node name="SpeedText" type="Control" parent="."]
 anchors_preset = 0

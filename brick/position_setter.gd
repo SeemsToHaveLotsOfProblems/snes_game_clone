@@ -1,7 +1,7 @@
 extends Node
 
 # This should equal teh size of the sprite + a small buffer like 5 pixels or so.
-const brick_size: int = 241
+const brick_size: int = Global.brick_size
 
 @onready var root_node: TouchScreenButton = $".."
 

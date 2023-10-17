@@ -5,7 +5,9 @@ extends Node
 signal move_bricks_up
 signal dragged_brick(brick: TouchScreenButton, direction: brick_direction)
 signal speed_changed
+signal gained_points
 
+const brick_size: int = 241
 const max_rows: int = 12
 const bricks_in_row: int = 5
 const row_start_pos := Vector2(-300, 680)
@@ -32,14 +34,19 @@ var timer: Timer
 
 var points_per_brick: int = 10
 var multiplier: int = 1
-
+var current_points: int = 0
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	randomize()
 	create_row()
 	make_timer()
-	connect("dragged_brick", handle_brick_drag)
+	dragged_brick.connect(handle_brick_drag)
+
+
+func gain_points() -> void:
+	current_points += points_per_brick * multiplier
+	gained_points.emit()
 
 
 func _input(event: InputEvent) -> void:
@@ -128,27 +135,43 @@ func handle_brick_drag(brick: TouchScreenButton, direction: brick_direction) -> 
 
 func swap_bricks(brick_row_pos: Vector2, direction: brick_direction, brick: TouchScreenButton) -> void:
 	var brick_to_swap: TouchScreenButton
-	
 	## Place the dragged brick back into the array, one place left or right of 
 	## it's original position.
 	var brick_holder: TouchScreenButton = null
 	if direction == brick_direction.RIGHT:
 		if brick_row_pos.y + 1 > bricks_in_row - 1:
 			return
-		brick_holder = row_array[brick_row_pos.x][1][brick_row_pos.y + 1]
-		row_array[brick_row_pos.x][1][brick_row_pos.y + 1] = brick
-		row_array[brick_row_pos.x][1][brick_row_pos.y] = brick_holder
+		elif row_array[brick_row_pos.x][1][brick_row_pos.y + 1] == null:
+			row_array[brick_row_pos.x][1][brick_row_pos.y + 1] = brick
+			row_array[brick_row_pos.x][1][brick_row_pos.y] = null
+		else:
+			brick_holder = row_array[brick_row_pos.x][1][brick_row_pos.y + 1]
+			row_array[brick_row_pos.x][1][brick_row_pos.y + 1] = brick
+			row_array[brick_row_pos.x][1][brick_row_pos.y] = brick_holder
+		
+		brick_to_swap = row_array[brick_row_pos.x][1][brick_row_pos.y]
+		if brick_to_swap == null:
+			brick.position += Vector2(brick_size, 0)
 	elif direction == brick_direction.LEFT:
 		if brick_row_pos.y - 1 < 0:
 			return
-		brick_holder = row_array[brick_row_pos.x][1][brick_row_pos.y - 1]
-		row_array[brick_row_pos.x][1][brick_row_pos.y - 1] = brick
-		row_array[brick_row_pos.x][1][brick_row_pos.y] = brick_holder
+		elif row_array[brick_row_pos.x][1][brick_row_pos.y - 1] == null:
+			row_array[brick_row_pos.x][1][brick_row_pos.y - 1] = brick
+			row_array[brick_row_pos.x][1][brick_row_pos.y] = null
+		else:
+			brick_holder = row_array[brick_row_pos.x][1][brick_row_pos.y - 1]
+			row_array[brick_row_pos.x][1][brick_row_pos.y - 1] = brick
+			row_array[brick_row_pos.x][1][brick_row_pos.y] = brick_holder
+		
+		brick_to_swap = row_array[brick_row_pos.x][1][brick_row_pos.y]
+		if brick_to_swap == null:
+			brick.position -= Vector2(brick_size, 0)
 	
-	brick_to_swap = row_array[brick_row_pos.x][1][brick_row_pos.y]
+	
 	var old_pos: Vector2 = brick.position
-	brick.position = brick_to_swap.position
-	brick_to_swap.position = old_pos
+	if not brick_to_swap == null:
+		brick.position = brick_to_swap.position
+		brick_to_swap.position = old_pos
 	check_color_match()
 
 

@@ -25,7 +25,6 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _on_released() -> void:
 	if draging:
-#		swipe_end = current_event.position
 		handle_swipe()
 		await get_tree().create_timer(0.2).timeout
 		draging = false
@@ -46,4 +45,5 @@ func pop_brick() -> void:
 		for brick in row[1]:
 			if brick == self:
 				brick = null
+				Global.gain_points()
 				self.queue_free()
