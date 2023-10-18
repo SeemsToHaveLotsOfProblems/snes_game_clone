@@ -21,7 +21,7 @@ enum brick_direction{
 ## loading in before them.
 var game_board: Node2D
 
-var brick_speed: int = 5 :
+var brick_speed: int = 2 :
 	set(val):
 		brick_speed = val
 		emit_signal("speed_changed")
@@ -194,13 +194,16 @@ func row_match_checker() -> Array[TouchScreenButton]:
 	var temp_brick_match_array: Array[TouchScreenButton] = []
 	var match_color: String
 	# Itterating through rows
-	for row in row_array:
+	for row in row_array.size():
+		if temp_brick_match_array.size() >= 3:
+			for matched in temp_brick_match_array:
+				brick_match_array.append(matched)
 		# Resetting the match color when rows switch
 		match_color = ""
 		temp_brick_match_array.clear()
 		
 		# Itterating through bricks
-		for _brick in row[1]:
+		for _brick in row_array[row][1]:
 			if _brick == null:
 				continue
 			
@@ -216,7 +219,8 @@ func row_match_checker() -> Array[TouchScreenButton]:
 						brick_match_array.append(matched)
 				temp_brick_match_array.clear()
 				temp_brick_match_array.append(_brick)
-	# Add any bricks still in the temporary array to the match array.
+	
+	# Adding this here as well to watch for the last row in the array.
 	if temp_brick_match_array.size() >= 3:
 		for matched in temp_brick_match_array:
 			brick_match_array.append(matched)
@@ -227,31 +231,38 @@ func colum_match_checker() -> Array[TouchScreenButton]:
 	var brick_match_array: Array[TouchScreenButton] = []
 	var tmp_match_array: Array[TouchScreenButton] = []
 	var match_color: String
+	var did_color_break: bool = false
+	var col_itr: int = -1
 	
-	for itr in row_array.size():
-		for row in row_array:
-			if itr >= bricks_in_row:
-				match_color = ""
-				continue
-			if row[1][itr] == null:
-				match_color = ""
-				continue
-			
-			var brick: TouchScreenButton = row[1][itr]
-			if match_color == "":
-				match_color = brick.brick_color
-			
-			if brick.brick_color == match_color:
-				tmp_match_array.append(brick)
-			else:
-				if tmp_match_array.size() >= 3:
-					for matched in tmp_match_array:
-						brick_match_array.append(matched)
-				match_color = brick.brick_color
-				tmp_match_array.clear()
-	if tmp_match_array.size() >= 3:
-		for el in tmp_match_array:
-			brick_match_array.append(el)
+	for row_itr in row_array.size():
+		col_itr += 1
+		# Prevent crash from null
+		if col_itr >= bricks_in_row:
+			continue
+		
+		# Asign brick variable.
+		var brick: TouchScreenButton = row_array[row_itr][1][col_itr]
+		
+		# Set color to match
+		if match_color == "":
+			match_color = brick.brick_color
+		
+		if brick.brick_color == match_color:
+			tmp_match_array.append(brick)
+		else:
+			match_color = brick.brick_color
+			did_color_break = true
+		
+		if row_itr == row_array.size():
+			did_color_break = true
+		
+		if did_color_break:
+			if tmp_match_array.size() >= 3:
+				for i in tmp_match_array:
+					brick_match_array.append(i)
+			tmp_match_array.clear()
+			did_color_break = false
+	
 	return brick_match_array
 
 
