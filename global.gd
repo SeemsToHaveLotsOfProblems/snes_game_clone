@@ -131,6 +131,7 @@ func handle_brick_drag(brick: TouchScreenButton, direction: brick_direction) -> 
 					break
 	
 	swap_bricks(brick_row_pos, direction, brick)
+	check_color_match()
 
 
 func swap_bricks(brick_row_pos: Vector2, direction: brick_direction, brick: TouchScreenButton) -> void:
@@ -172,48 +173,86 @@ func swap_bricks(brick_row_pos: Vector2, direction: brick_direction, brick: Touc
 	if not brick_to_swap == null:
 		brick.position = brick_to_swap.position
 		brick_to_swap.position = old_pos
-	check_color_match()
 
 
 func check_color_match() -> void:
 	# Check for 3 or more in a row.
-	@warning_ignore("unassigned_variable")
-	var brick_row_match: Array[TouchScreenButton]
-	@warning_ignore("unused_variable")
-	var brick_colum_match: Array[TouchScreenButton]
-	var match_color: String
-	for row in row_array:
-		# When new row is searched it checks the pop array first.
-		if brick_row_match.size() >= 3:
-			for matched in brick_row_match:
-				matched.pop_brick()
-		brick_row_match.clear()
-		# Row Checking
-		for _brick in row[1]:
-			if _brick != null:
-				if brick_row_match.is_empty():
-					match_color = _brick.brick_color
-				
-				if _brick.brick_color == match_color:
-					brick_row_match.append(_brick)
-				
-				if _brick.brick_color != match_color:
-					# When color breaks happen the brick pop triggers
-					if brick_row_match.size() >= 3:
-						for matched in brick_row_match:
-							matched.pop_brick()
-					# Clear out the match array
-					brick_row_match.clear()
-			else:
-				if brick_row_match.size() >= 3:
-					for matched in brick_row_match:
-						matched.pop_brick()
-				# Clear out the match array
-				brick_row_match.clear()
-		# Colum checking.
-		
+	var brick_match_array: Array[TouchScreenButton] = row_match_checker()
+	# Check for 3 or more in a colum
+	brick_match_array += colum_match_checker()
+	# Pop the matched bricks
+	for bricks_to_pop in brick_match_array:
+		bricks_to_pop.pop_brick()
+	
 	drop_floating_bricks()
 	# Update score.
+
+
+func row_match_checker() -> Array[TouchScreenButton]:
+	# Check for 3 or more in a row.
+	var brick_match_array: Array[TouchScreenButton] = []
+	var temp_brick_match_array: Array[TouchScreenButton] = []
+	var match_color: String
+	# Itterating through rows
+	for row in row_array:
+		# Resetting the match color when rows switch
+		match_color = ""
+		temp_brick_match_array.clear()
+		
+		# Itterating through bricks
+		for _brick in row[1]:
+			if _brick == null:
+				continue
+			
+			if match_color == "":
+				match_color = _brick.brick_color
+			
+			if _brick.brick_color == match_color:
+				temp_brick_match_array.append(_brick)
+			else:
+				match_color = _brick.brick_color
+				if temp_brick_match_array.size() >= 3:
+					for matched in temp_brick_match_array:
+						brick_match_array.append(matched)
+				temp_brick_match_array.clear()
+				temp_brick_match_array.append(_brick)
+	# Add any bricks still in the temporary array to the match array.
+	if temp_brick_match_array.size() >= 3:
+		for matched in temp_brick_match_array:
+			brick_match_array.append(matched)
+	return brick_match_array
+
+
+func colum_match_checker() -> Array[TouchScreenButton]:
+	var brick_match_array: Array[TouchScreenButton] = []
+	var tmp_match_array: Array[TouchScreenButton] = []
+	var match_color: String
+	
+	for itr in row_array.size():
+		for row in row_array:
+			if itr >= bricks_in_row:
+				match_color = ""
+				continue
+			if row[1][itr] == null:
+				match_color = ""
+				continue
+			
+			var brick: TouchScreenButton = row[1][itr]
+			if match_color == "":
+				match_color = brick.brick_color
+			
+			if brick.brick_color == match_color:
+				tmp_match_array.append(brick)
+			else:
+				if tmp_match_array.size() >= 3:
+					for matched in tmp_match_array:
+						brick_match_array.append(matched)
+				match_color = brick.brick_color
+				tmp_match_array.clear()
+	if tmp_match_array.size() >= 3:
+		for el in tmp_match_array:
+			brick_match_array.append(el)
+	return brick_match_array
 
 
 # Finds how far down the next brick is and drops any floating bricks.
