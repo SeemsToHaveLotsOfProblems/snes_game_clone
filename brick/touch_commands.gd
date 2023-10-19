@@ -4,6 +4,7 @@ extends TouchScreenButton
 const dead_zone: int = 50
 
 @onready var brick_color: String = %ColorPicker.brick_color
+@onready var anim_player: AnimationPlayer = %AnimationPlayer
 var draging: bool = false
 
 var swipe_start: Vector2 = Vector2.ZERO
@@ -31,12 +32,13 @@ func _on_released() -> void:
 
 
 func handle_swipe() -> void:
+#	anim_player.play("Move")
+#	await anim_player.animation_finished
 	if Vector2(swipe_start - swipe_end).x < dead_zone: # Right
-#		print(brick_color + " brick, draged to the right")
 		Global.emit_signal("dragged_brick", self, Global.brick_direction.RIGHT)
 	elif Vector2(swipe_start - swipe_end).x > dead_zone: # Left
-#		print(brick_color + " brick, draged to the left")
 		Global.emit_signal("dragged_brick", self, Global.brick_direction.LEFT)
+#	anim_player.play("Drop")
 
 
 
@@ -45,5 +47,12 @@ func pop_brick() -> void:
 		for brick in row[1]:
 			if brick == self:
 				brick = null
+				Global.bricks_popped += 1
 				Global.gain_points()
 				self.queue_free()
+
+
+func _on_animation_player_animation_started(_anim_name: StringName) -> void:
+#	if anim_name == "Move":
+#		position += Vector2(12.5, 12.5)
+	pass

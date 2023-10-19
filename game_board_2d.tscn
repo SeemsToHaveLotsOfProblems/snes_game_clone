@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://dv8h2tcrugk15"]
+[gd_scene load_steps=3 format=3 uid="uid://dv8h2tcrugk15"]
 
 [ext_resource type="PackedScene" uid="uid://dn6d602qsyva4" path="res://top_ui_container.tscn" id="1_avedt"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_6jafl"]
 
 [node name="GameBoard" type="Node2D"]
 
@@ -11,3 +13,29 @@ offset_left = -723.0
 offset_top = -1608.0
 offset_right = 719.0
 offset_bottom = -1208.0
+
+[node name="GameOverLabel" type="RichTextLabel" parent="."]
+visible = false
+top_level = true
+offset_left = -570.0
+offset_top = -146.0
+offset_right = 629.0
+offset_bottom = 97.0
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/normal_font_size = 74
+bbcode_enabled = true
+text = "[center]GAME OVER
+[center]SCORE: [rainbow]0000"
+fit_content = true
+scroll_active = false
+
+[node name="TextureRect" type="TextureRect" parent="GameOverLabel"]
+self_modulate = Color(0, 0, 0, 0.627451)
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("PlaceholderTexture2D_6jafl")

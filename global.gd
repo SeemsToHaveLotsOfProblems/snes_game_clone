@@ -11,6 +11,7 @@ const brick_size: int = 241
 const max_rows: int = 12
 const bricks_in_row: int = 5
 const row_start_pos := Vector2(-300, 680)
+const tween_speed: float = 0.2
 
 enum brick_direction{
 	RIGHT = 0,
@@ -33,14 +34,15 @@ var row_array: Array[Array] = []
 
 var timer: Timer
 
+var bricks_popped: int = 0
 var points_per_brick: int = 10
 var multiplier: int = 1
 var current_points: int = 0 :
 	set(val):
 		current_points = val
-		if current_points % 100 == 0:
+		if bricks_popped % 30 == 0:
 			multiplier += 1
-		if current_points % 10_000 == 0: # This won't work but find a way to make it work.
+		if bricks_popped % 60 == 0: # This won't work but find a way to make it work.
 			if not brick_speed == 1:
 				brick_speed -= 1
 
@@ -110,17 +112,15 @@ func make_timer() -> void:
 
 func gameover() -> void:
 	timer.stop()
+	get_tree().paused = true
+	timer.paused = true
+	var text: String = "[center]GAME OVER!\n[center]SCORE: [rainbow]" + str(current_points).pad_zeros(4)
+	game_board.get_node("GameOverLabel").text = text
+	game_board.get_node("GameOverLabel").visible = true
 	print("You lose the game!")
 
 
 func handle_brick_drag(brick: TouchScreenButton, direction: brick_direction) -> void:
-	# Prints can be removed but for now are useful to keep track of the running code
-	print("\nReceived brick info:\nBrick Color: " + brick.brick_color)
-	if direction == brick_direction.RIGHT:
-		print("Direction: Right")
-	else:
-		print("Direction: Left")
-	
 	# Itterate through my bricks to find the row and position.
 	@warning_ignore("unassigned_variable")
 	var brick_row_pos := Vector2(-1, -1)
@@ -132,8 +132,6 @@ func handle_brick_drag(brick: TouchScreenButton, direction: brick_direction) -> 
 			for _brick in row[1]:
 				brick_row_pos.y += 1
 				if _brick == brick:
-					print("Brick Row: ", brick_row_pos.x)
-					print("Brick pos: ", brick_row_pos.y)
 					# We only need the break here because the variable is incremented as the loop runs.
 					found_brick = true
 					break
@@ -160,6 +158,10 @@ func swap_bricks(brick_row_pos: Vector2, direction: brick_direction, brick: Touc
 		
 		brick_to_swap = row_array[brick_row_pos.x][1][brick_row_pos.y]
 		if brick_to_swap == null:
+#			var tween: Tween = get_tree().create_tween()
+#			var new_pos: Vector2 = brick.position + Vector2(brick_size, 0)
+#			tween.tween_property(brick, "position", new_pos, tween_speed)
+#			await  tween.finished
 			brick.position += Vector2(brick_size, 0)
 	elif direction == brick_direction.LEFT:
 		if brick_row_pos.y - 1 < 0:
@@ -174,12 +176,22 @@ func swap_bricks(brick_row_pos: Vector2, direction: brick_direction, brick: Touc
 		
 		brick_to_swap = row_array[brick_row_pos.x][1][brick_row_pos.y]
 		if brick_to_swap == null:
+#			var tween: Tween = get_tree().create_tween()
+#			var new_pos: Vector2 = brick.position - Vector2(brick_size, 0)
+#			tween.tween_property(brick, "position", new_pos, tween_speed)
+#			await tween.finished
 			brick.position -= Vector2(brick_size, 0)
 	
 	
 	var old_pos: Vector2 = brick.position
 	if not brick_to_swap == null:
+#		var tween: Tween = get_tree().create_tween()
+#		tween.tween_property(brick, "position", brick_to_swap.position, tween_speed)
+#		await tween.finished
 		brick.position = brick_to_swap.position
+#		var tween2: Tween = get_tree().create_tween()
+#		tween2.tween_property(brick_to_swap, "position", old_pos, tween_speed)
+#		await tween2.finished
 		brick_to_swap.position = old_pos
 
 
