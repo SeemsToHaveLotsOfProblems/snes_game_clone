@@ -21,10 +21,11 @@ enum brick_direction{
 ## loading in before them.
 var game_board: Node2D
 
-var brick_speed: int = 2 :
+var brick_speed: int = 5 :
 	set(val):
 		brick_speed = val
 		emit_signal("speed_changed")
+		timer.start(val)
 	get:
 		return brick_speed
 
@@ -34,7 +35,14 @@ var timer: Timer
 
 var points_per_brick: int = 10
 var multiplier: int = 1
-var current_points: int = 0
+var current_points: int = 0 :
+	set(val):
+		current_points = val
+		if current_points % 100 == 0:
+			multiplier += 1
+		if current_points % 10_000 == 0: # This won't work but find a way to make it work.
+			if not brick_speed == 1:
+				brick_speed -= 1
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -185,6 +193,7 @@ func check_color_match() -> void:
 		bricks_to_pop.pop_brick()
 	
 	drop_floating_bricks()
+	check_for_null_row()
 	# Update score.
 
 
@@ -267,5 +276,33 @@ func colum_match_checker() -> Array[TouchScreenButton]:
 
 
 # Finds how far down the next brick is and drops any floating bricks.
-func drop_floating_bricks() -> void:
-	pass
+func drop_floating_bricks() -> bool:
+	var did_drop_bricks: bool = true
+	var return_value: bool = false
+	while did_drop_bricks:
+		did_drop_bricks = false
+		for col_itr in bricks_in_row:
+			for row_itr in row_array.size():
+				if row_array[row_itr][1][col_itr] == null:
+					continue
+				
+				var brick: TouchScreenButton = row_array[row_itr][1][col_itr]
+				
+				if not row_itr + 1 >= row_array.size():
+					if row_array[row_itr+1][1][col_itr] == null:
+						row_array[row_itr+1][1][col_itr] = brick
+						row_array[row_itr][1][col_itr] = null
+						brick.position += Vector2(0, brick_size)
+						did_drop_bricks = true
+						return_value = true
+	return return_value
+
+
+func check_for_null_row() -> void:
+	for row in row_array:
+		var is_null_row: bool = true
+		for brick in row[1]:
+			if not brick == null:
+				is_null_row = false
+		if is_null_row:
+			row_array.erase(row)
