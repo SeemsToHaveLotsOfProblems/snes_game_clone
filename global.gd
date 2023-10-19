@@ -205,6 +205,9 @@ func row_match_checker() -> Array[TouchScreenButton]:
 		# Itterating through bricks
 		for _brick in row_array[row][1]:
 			if _brick == null:
+				if temp_brick_match_array.size() >= 3:
+					brick_match_array += temp_brick_match_array
+				temp_brick_match_array.clear()
 				continue
 			
 			if match_color == "":
@@ -231,37 +234,34 @@ func colum_match_checker() -> Array[TouchScreenButton]:
 	var brick_match_array: Array[TouchScreenButton] = []
 	var tmp_match_array: Array[TouchScreenButton] = []
 	var match_color: String
-	var did_color_break: bool = false
-	var col_itr: int = -1
 	
-	for row_itr in row_array.size():
-		col_itr += 1
-		# Prevent crash from null
-		if col_itr >= bricks_in_row:
-			continue
-		
-		# Asign brick variable.
-		var brick: TouchScreenButton = row_array[row_itr][1][col_itr]
-		
-		# Set color to match
-		if match_color == "":
-			match_color = brick.brick_color
-		
-		if brick.brick_color == match_color:
-			tmp_match_array.append(brick)
-		else:
-			match_color = brick.brick_color
-			did_color_break = true
-		
-		if row_itr == row_array.size():
-			did_color_break = true
-		
-		if did_color_break:
-			if tmp_match_array.size() >= 3:
-				for i in tmp_match_array:
-					brick_match_array.append(i)
-			tmp_match_array.clear()
-			did_color_break = false
+	for col_itr in bricks_in_row:
+		for row_itr in row_array:
+			if row_itr[1][col_itr] == null:
+				if tmp_match_array.size() >= 3:
+					brick_match_array += tmp_match_array
+				tmp_match_array.clear()
+				continue
+			
+			var brick: TouchScreenButton = row_itr[1][col_itr]
+			
+			if match_color == "":
+				match_color = brick.brick_color
+			
+			if brick.brick_color == match_color:
+				tmp_match_array.append(brick)
+			else:
+				if tmp_match_array.size() >= 3:
+					brick_match_array += tmp_match_array
+				tmp_match_array.clear()
+				match_color = brick.brick_color
+				tmp_match_array.append(brick)
+			
+			# Ensures that the last colum gets read in too.
+			if row_itr == row_array.back():
+				if tmp_match_array.size() >= 3:
+					brick_match_array += tmp_match_array
+				tmp_match_array.clear()
 	
 	return brick_match_array
 
