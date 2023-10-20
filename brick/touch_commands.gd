@@ -32,6 +32,8 @@ func _on_released() -> void:
 
 
 func handle_swipe() -> void:
+#	if anim_player.is_playing():
+#		return
 #	anim_player.play("Move")
 #	await anim_player.animation_finished
 	if Vector2(swipe_start - swipe_end).x < dead_zone: # Right
@@ -39,20 +41,25 @@ func handle_swipe() -> void:
 	elif Vector2(swipe_start - swipe_end).x > dead_zone: # Left
 		Global.emit_signal("dragged_brick", self, Global.brick_direction.LEFT)
 #	anim_player.play("Drop")
+#	await anim_player.animation_finished
 
 
 
 func pop_brick() -> void:
+	if anim_player.is_playing():
+		return
 	for row in Global.row_array:
 		for brick in row[1]:
 			if brick == self:
 				brick = null
 				Global.bricks_popped += 1
 				Global.gain_points()
+				anim_player.play("Pop")
+				await anim_player.animation_finished
 				self.queue_free()
 
 
-func _on_animation_player_animation_started(_anim_name: StringName) -> void:
-#	if anim_name == "Move":
-#		position += Vector2(12.5, 12.5)
-	pass
+func _on_animation_player_animation_started(anim_name: StringName) -> void:
+	if anim_name == "Pop":
+		position += Vector2(12.5, 12.5)
+

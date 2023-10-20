@@ -11,7 +11,7 @@ const brick_size: int = 241
 const max_rows: int = 12
 const bricks_in_row: int = 5
 const row_start_pos := Vector2(-300, 680)
-const tween_speed: float = 0.2
+const tween_speed: float = 0.05
 
 enum brick_direction{
 	RIGHT = 0,
@@ -40,11 +40,13 @@ var multiplier: int = 1
 var current_points: int = 0 :
 	set(val):
 		current_points = val
-		if bricks_popped % 30 == 0:
+		if bricks_popped % 60 == 0:
 			multiplier += 1
-		if bricks_popped % 60 == 0: # This won't work but find a way to make it work.
+		if bricks_popped % 100 == 0:
 			if not brick_speed == 1:
 				brick_speed -= 1
+
+var swapping_bricks: bool = false
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -52,6 +54,10 @@ func _ready() -> void:
 	create_row()
 	make_timer()
 	dragged_brick.connect(handle_brick_drag)
+
+
+func _process(_delta: float) -> void:
+	check_color_match()
 
 
 func gain_points() -> void:
@@ -117,7 +123,6 @@ func gameover() -> void:
 	var text: String = "[center]GAME OVER!\n[center]SCORE: [rainbow]" + str(current_points).pad_zeros(4)
 	game_board.get_node("GameOverLabel").text = text
 	game_board.get_node("GameOverLabel").visible = true
-	print("You lose the game!")
 
 
 func handle_brick_drag(brick: TouchScreenButton, direction: brick_direction) -> void:
@@ -158,10 +163,6 @@ func swap_bricks(brick_row_pos: Vector2, direction: brick_direction, brick: Touc
 		
 		brick_to_swap = row_array[brick_row_pos.x][1][brick_row_pos.y]
 		if brick_to_swap == null:
-#			var tween: Tween = get_tree().create_tween()
-#			var new_pos: Vector2 = brick.position + Vector2(brick_size, 0)
-#			tween.tween_property(brick, "position", new_pos, tween_speed)
-#			await  tween.finished
 			brick.position += Vector2(brick_size, 0)
 	elif direction == brick_direction.LEFT:
 		if brick_row_pos.y - 1 < 0:
@@ -176,22 +177,12 @@ func swap_bricks(brick_row_pos: Vector2, direction: brick_direction, brick: Touc
 		
 		brick_to_swap = row_array[brick_row_pos.x][1][brick_row_pos.y]
 		if brick_to_swap == null:
-#			var tween: Tween = get_tree().create_tween()
-#			var new_pos: Vector2 = brick.position - Vector2(brick_size, 0)
-#			tween.tween_property(brick, "position", new_pos, tween_speed)
-#			await tween.finished
 			brick.position -= Vector2(brick_size, 0)
 	
 	
 	var old_pos: Vector2 = brick.position
 	if not brick_to_swap == null:
-#		var tween: Tween = get_tree().create_tween()
-#		tween.tween_property(brick, "position", brick_to_swap.position, tween_speed)
-#		await tween.finished
 		brick.position = brick_to_swap.position
-#		var tween2: Tween = get_tree().create_tween()
-#		tween2.tween_property(brick_to_swap, "position", old_pos, tween_speed)
-#		await tween2.finished
 		brick_to_swap.position = old_pos
 
 
@@ -200,13 +191,11 @@ func check_color_match() -> void:
 	var brick_match_array: Array[TouchScreenButton] = row_match_checker()
 	# Check for 3 or more in a colum
 	brick_match_array += colum_match_checker()
+	drop_floating_bricks()
+	check_for_null_row()
 	# Pop the matched bricks
 	for bricks_to_pop in brick_match_array:
 		bricks_to_pop.pop_brick()
-	
-	drop_floating_bricks()
-	check_for_null_row()
-	# Update score.
 
 
 func row_match_checker() -> Array[TouchScreenButton]:

@@ -14,7 +14,7 @@ config/name="project_hello_mobile"
 config/description="A mobile game made in the Godot engine.s"
 run/main_scene="res://game_board_2d.tscn"
 config/features=PackedStringArray("4.1", "Mobile")
-run/max_fps=60
+run/max_fps=30
 config/icon="res://icon.svg"
 
 [autoload]
